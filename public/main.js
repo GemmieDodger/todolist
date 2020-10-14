@@ -37,14 +37,12 @@ const viewInProcessTask = task => {
     draggable="true" 
     onclick="app.run('done', ${task.id})"
     ondragstart="app.run('onDragTask', event)"
-    class="${task.status === 0 ? '' : 'done'} listItem"
-
+    class=" listItem"
     >${task.text}
-        <input class="check" onchange="app.run('checked', ${task.id})" ${task.status===1 ? 'checked' : ''} type="checkbox" )">
-        <button class="deleteButton" onclick="app.run('deleteTask', ${task.id})">Delete</button>
+        <button class="deleteButton" onclick="app.run('deleteInProcessTask', ${task.id})">Delete</button>
     </li>
     `
-}
+} 
 
 
 const view = (state) => `
@@ -66,10 +64,12 @@ const view = (state) => `
                     </section>
             <section id="list2">
                 <h3>In Process</h3>
-                    <ul ondragover="event.preventDefault()"  ondrop="app.run('onDropInProcessTask', event)">
+                    <div style="height: 80%;" ondragover="event.preventDefault()"  ondrop="app.run('onDropInProcessTask', event)">
+                    <ul>
                         ${state.inProcessTasks.map(viewInProcessTask).join("")}
                     </ul>
-                    <div class="deleteOnHover" ondragover="event.preventDefault()" ondrop="app.run('onDropTask', event)">Delete</div>  
+                    </div>
+                    <div class="deleteOnHover" ondragover="event.preventDefault()" ondrop="app.run('onDropDeleteInProcessTask', event)">Delete</div>  
             </section>
         </div>
 `
@@ -139,33 +139,26 @@ const update = {
             body: JSON.stringify(task)
         } 
         fetch('/inProcessTasks',postRequest).then(() => app.run('getInProcessTasks'))
-        console.log("addinprocesstask")
-        console.log(task)
         return State
     }),
 
     getInProcessTasks: async (state) => {
         state.inProcessTasks = await fetch('/inProcessTasks').then(res => res.json())
-        console.log("getinprocesstasks")
         console.log(state.inProcessTasks)
         return state
     },
     addInProcessTasks: (state, inProcessTasks) => {
         state.inProcessTasks = {...state.inProcessTasks, ...inProcessTasks}
-        console.log("addinprocesstasks")
-        console.log(state.inProcessTasks)
         return state
     },
 
     onDropInProcessTask: (state, event) => {
         const id = event.dataTransfer.getData('text')
-        console.log(id)
         const index = state.tasks.findIndex(task => task.id == id)
         var movedTask = state.tasks.splice(index,1)
-        state.inProcessTasks.push(movedTask)
-
-        console.log("ondropinprocesstasks")
         console.log(movedTask)
+        state.inProcessTasks = state.inProcessTasks.concat(movedTask)
+        console.log(state.inProcessTasks)
         const postRequest = {
             method: 'POST',
             headers: {
@@ -173,8 +166,22 @@ const update = {
             },
             body: JSON.stringify(movedTask)
         } 
-        fetch('/inProcessTasks',postRequest).then(() => app.run('getInProcessTasks'))
         return state
+    },
+    deleteInProcessTask: (state, id) => {
+    
+        const index = state.inProcessTasks.findIndex(element=> element.id === id)
+        state.inProcessTasks.splice(index,1)
+        return state
+    },
+
+    onDropDeleteInProcessTask: (state, event) => {
+        const id = event.dataTransfer.getData('text')
+        console.log(id)
+        const index = state.inProcessTasks.findIndex(task => task.id == id)
+        state.inProcessTasks.splice(index,1)
+        return state
+
     }
     
     // onHightlightTask: (state, event) => {
@@ -187,3 +194,4 @@ const update = {
 }
 app.start('todoApp', state, view, update)
 app.run('getTasks')
+app.run('getInProcessTasks')

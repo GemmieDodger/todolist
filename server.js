@@ -53,8 +53,8 @@ app.get('/inProcessTasks', (req, res) => {
     res.send(inProcessTasks)
 })
 app.post('/inProcessTasks', (req,res) => {
-    const inProcessTask = req.body
-    inProcessTasks.push(inProcessTask)
+    const task = req.body
+    inProcessTasks.push(task)
     res.send(inProcessTasks)
 })
 

@@ -3,6 +3,7 @@
     margin:0px;
     padding: 0px;
     font-size: 18px;
+   
 }
 
 body {
@@ -21,11 +22,19 @@ h2 {
     color: lightpink;
 }
 
+h3 {
+    color:  grey;
+    padding-top: 10px;
+}
+
 ul {
     padding: 5%;
     list-style-type:none;
+    height: 60%;
 }
-
+/* section {
+    border: block 2px palegreen;
+} */
 button {
 
     padding: 4px;
@@ -51,11 +60,20 @@ button {
     margin-top: 4px;
     margin-bottom: 4px;
 }
-.container {
+#container {
     display: grid;
-    grid-template-columns: 40% 40%;
+    grid-template-columns: 50% 50%;
     grid-template-rows: none;
-    
+    position: relative; 
+    grid-template-areas:
+        'list1 list2'
+}
+#list1 {
+    grid-area: list1;
+
+}
+#list2 {
+    grid-area: list2;
 }
 .deleteOnHover {
     padding-top: 2%;
